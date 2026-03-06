@@ -1,0 +1,44 @@
+from collections import defaultdict
+
+def find_bridges(n, edges):
+    graph = defaultdict(list)
+
+    # build graph
+    for u, v in edges:
+        graph[u].append(v)
+        graph[v].append(u)
+
+    visited = [False] * n
+    disc = [0] * n
+    low = [0] * n
+    time = [0]
+    bridges = []
+
+    def dfs(u, parent):
+        visited[u] = True
+        disc[u] = low[u] = time[0]
+        time[0] += 1
+
+        for v in graph[u]:
+            if not visited[v]:
+                dfs(v, u)
+                low[u] = min(low[u], low[v])
+
+                if low[v] > disc[u]:
+                    bridges.append((u, v))
+
+            elif v != parent:
+                low[u] = min(low[u], disc[v])
+
+    for i in range(n):
+        if not visited[i]:
+            dfs(i, -1)
+
+    return bridges
+
+
+# Example
+n = 5
+edges = [(0,1), (1,2), (2,0), (1,3), (3,4)]
+
+print("Critical Links:", find_bridges(n, edges))
